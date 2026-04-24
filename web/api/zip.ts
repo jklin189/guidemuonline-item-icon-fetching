@@ -180,6 +180,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const execPath = await chromiumLambda.executablePath();
     const browser = await chromium.launch({
       args: chromiumLambda.args,
+      defaultViewport: chromiumLambda.defaultViewport,
       executablePath: execPath || undefined,
       headless: true,
     });
