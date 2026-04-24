@@ -127,7 +127,12 @@ function createLimiter(concurrency) {
 }
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    exposedHeaders: ["Content-Disposition"],
+  }),
+);
 app.use((req, _res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
@@ -380,7 +385,7 @@ app.get("/api/zip", async (req, res) => {
   }
 });
 
-const port = Number(process.env.PORT ?? 5175);
+const port = Number(process.env.PORT ?? 8080);
 app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`server listening on http://localhost:${port}`);

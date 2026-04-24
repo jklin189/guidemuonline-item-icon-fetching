@@ -5,9 +5,17 @@ const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()
 
 const ZIP_CONCURRENCY = 10;
 
+function getApiBaseUrl() {
+  // Vite exposes env vars on import.meta.env at build time.
+  const env = import.meta.env as unknown as Record<string, string | undefined>;
+  const raw = env.VITE_API_BASE_URL;
+  return raw ? String(raw).replace(/\/+$/, "") : "";
+}
+
 async function downloadZipViaFetch(pageUrl: string, signal?: AbortSignal) {
+  const base = getApiBaseUrl();
   const res = await fetch(
-    `/api/zip?url=${encodeURIComponent(pageUrl)}&concurrency=${ZIP_CONCURRENCY}`,
+    `${base}/api/zip?url=${encodeURIComponent(pageUrl)}&concurrency=${ZIP_CONCURRENCY}`,
     { signal },
   );
   if (!res.ok) {
@@ -114,7 +122,9 @@ function App() {
               {zipping ? "Preparing ZIP…" : "Download ZIP"}
             </button>
             <div className="meta">
-              <span className="hint">Downloads a ZIP from local `/api/zip`.</span>
+              <span className="hint">
+                Downloads a ZIP from <code>{getApiBaseUrl() || "backend"}</code>.
+              </span>
             </div>
           </div>
 
