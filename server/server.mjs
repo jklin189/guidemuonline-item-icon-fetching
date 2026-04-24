@@ -2,6 +2,11 @@ import express from "express";
 import cors from "cors";
 import archiver from "archiver";
 
+// When deployed via Playwright Docker image, browsers live here.
+// Render sometimes ignores Dockerfile ENV during runtime; enforce in code.
+if (!process.env.PLAYWRIGHT_BROWSERS_PATH) process.env.PLAYWRIGHT_BROWSERS_PATH = "/ms-playwright";
+if (!process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD) process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+
 function sanitizeFilename(name) {
   const cleaned = String(name)
     .replaceAll(/[<>:"/\\|?*\u0000-\u001F]/g, "_")
