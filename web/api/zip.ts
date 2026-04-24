@@ -1,12 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+// Archiver types are not always present in Vercel builds.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import archiver from "archiver";
 import chromiumLambda from "@sparticuz/chromium";
 import { chromium } from "playwright-core";
 
 function sanitizeFilename(name: string) {
   const cleaned = String(name)
-    .replaceAll(/[<>:"/\\|?*\u0000-\u001F]/g, "_")
-    .replaceAll(/\s+/g, " ")
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "_")
+    .replace(/\s+/g, " ")
     .trim();
   return cleaned.length ? cleaned : "file";
 }
@@ -163,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
 
     const archive = archiver("zip", { zlib: { level: 9 } });
-    archive.on("error", (err) => {
+    archive.on("error", (err: unknown) => {
       try {
         // eslint-disable-next-line no-console
         console.error(err);
@@ -178,7 +181,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const browser = await chromium.launch({
       args: chromiumLambda.args,
       executablePath: execPath || undefined,
-      headless: chromiumLambda.headless,
+      headless: true,
     });
 
     try {
