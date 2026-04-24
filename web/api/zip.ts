@@ -180,13 +180,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const execPath = await chromiumLambda.executablePath();
     const browser = await chromium.launch({
       args: chromiumLambda.args,
-      defaultViewport: chromiumLambda.defaultViewport,
       executablePath: execPath || undefined,
       headless: true,
     });
 
     try {
-      const context = await browser.newContext();
+      const context = await browser.newContext({
+        viewport: chromiumLambda.defaultViewport as any,
+      });
       const page = await context.newPage();
       page.setDefaultTimeout(Math.min(timeoutMs, overallTimeoutMs));
 
